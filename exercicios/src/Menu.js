@@ -12,6 +12,10 @@ import Plataforms from './components/Plataforms';
 import ValidationProps from './components/ValidationProps';
 import Events from './components/Events';
 import EventsHooks from './components/EventsHooks';
+import {Grandfather} from './components/ComunicationWithProps';
+import {TextSync} from './components/ComunicationWithoutProps';
+import ListFlex from './components/ListFlex';
+import Flex from './components/Flex';
 
 const SimpleComponent = () => <Simple content={'Menu Drawer com Swipe'} />;
 const ParAndImparComponent = () => <ParAndImpar number={3} />;
@@ -25,6 +29,12 @@ const ValidationPropsComponent = () => (
 );
 const EventComponent = () => <Events />;
 const EventHooksComponent = () => <EventsHooks />;
+const ComunicationWithPropsComponent = () => (
+  <Grandfather name="Altair" lastName="Bitencourt" />
+);
+const ComunicationWithoutPropsComponent = () => <TextSync />;
+const ListFlexComponent = () => <ListFlex />;
+const FlexComponent = () => <Flex />;
 
 const Drawer = createDrawerNavigator();
 
@@ -34,6 +44,19 @@ const MenuExercicios = () => {
   return (
     <Drawer.Navigator
       drawerType={dimensions.width >= 768 ? 'permanent' : 'front'}>
+      <Drawer.Screen name="Flex Box" component={FlexComponent} />
+      <Drawer.Screen
+        name="Lista de Itens(Flex Box)"
+        component={ListFlexComponent}
+      />
+      <Drawer.Screen
+        name="Comunicação Indireta"
+        component={ComunicationWithoutPropsComponent}
+      />
+      <Drawer.Screen
+        name="Comunicação Direta"
+        component={ComunicationWithPropsComponent}
+      />
       <Drawer.Screen name="Eventos com Hooks" component={EventHooksComponent} />
       <Drawer.Screen name="Eventos" component={EventComponent} />
       <Drawer.Screen

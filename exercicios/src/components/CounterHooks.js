@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {useState} from 'react';
 import {View, Text, TouchableHighlight} from 'react-native';
 import Standard from '../style/Standard';

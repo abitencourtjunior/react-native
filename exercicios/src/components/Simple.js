@@ -1,6 +1,6 @@
-import React from 'react'
-import { Text, StyleSheet } from 'react-native'
-import Standard from '../style/Standard'
+import React from 'react';
+import {Text, StyleSheet} from 'react-native';
+import Standard from '../style/Standard';
 
 // Primeira forma
 
@@ -16,5 +16,4 @@ import Standard from '../style/Standard'
 
 // Terceira Forma
 
-export default props => <Text style={Standard.ex}>{props.content}</Text>
-
+export default (props) => <Text style={Standard.ex}>{props.content}</Text>;
