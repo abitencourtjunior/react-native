@@ -7,38 +7,45 @@ import {
   FlatList,
   TouchableOpacity,
   Platform,
+  Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+Icon.loadFont();
+import moment from 'moment';
+import 'moment/locale/pt-br';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import commonStyles from '../commonStyles';
 import todayImage from '../../src/assets/imgs/today.jpg';
 
 import Task from '../components/Task.js';
-
-import moment from 'moment';
-import 'moment/locale/pt-br';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import AddTask from './AddTask';
-Icon.loadFont();
 
+const initState = {
+  showAddTask: false,
+  showDoneTasks: true,
+  visibleTasks: [],
+  tasks: [],
+};
 export default class TaskList extends Component {
   state = {
-    showAddTask: true,
-    showDoneTasks: true,
-    visibleTasks: [],
-    tasks: [
-      {
-        id: Math.random(),
-        desc: 'Iniciar TCC',
-        estimateAt: new Date(),
-        doneAt: new Date(),
-      },
-      {
-        id: Math.random(),
-        desc: 'Iniciar TCC',
-        estimateAt: new Date(),
-        doneAt: null,
-      },
-    ],
+    ...initState,
+  };
+
+  addTask = (newTask) => {
+    if (!newTask.desc || !newTask.desc.trim()) {
+      Alert.alert('Dados Inválidos', 'Descrição não informada!');
+      return;
+    }
+
+    const tasks = [...this.state.tasks];
+    tasks.push({
+      id: Math.random(),
+      desc: newTask.desc,
+      estimateAt: newTask.date,
+      doneAt: null,
+    });
+    this.setState({tasks, showAddTask: false}, this.filterTasks);
   };
 
   toogleTask = (taskId) => {
@@ -66,10 +73,18 @@ export default class TaskList extends Component {
     }
 
     this.setState({visibleTasks});
+    AsyncStorage.setItem('TasksState', JSON.stringify(this.state));
   };
 
-  componentDidMount = () => {
-    this.filterTasks();
+  componentDidMount = async () => {
+    const stateSting = await AsyncStorage.getItem('TasksState');
+    const state = JSON.parse(stateSting) || initState;
+    this.setState(state, this.filterTasks);
+  };
+
+  deleteTask = (id) => {
+    const tasks = this.state.tasks.filter((task) => task.id !== id);
+    this.setState({tasks}, this.filterTasks);
   };
 
   render() {
@@ -79,6 +94,7 @@ export default class TaskList extends Component {
         <AddTask
           isVisible={this.state.showAddTask}
           onCancel={() => this.setState({showAddTask: false})}
+          onSave={this.addTask}
         />
         <ImageBackground source={todayImage} style={styles.backgroud}>
           <View style={styles.iconBar}>
@@ -100,10 +116,20 @@ export default class TaskList extends Component {
             data={this.state.visibleTasks}
             keyExtractor={(item) => `${item.id}`}
             renderItem={({item}) => (
-              <Task {...item} toogleTask={this.toogleTask} />
+              <Task
+                {...item}
+                onToogleTask={this.toogleTask}
+                onDelete={this.deleteTask}
+              />
             )}
           />
         </View>
+        <TouchableOpacity
+          style={styles.addButton}
+          activeOpacity={0.7}
+          onPress={() => this.setState({showAddTask: true})}>
+          <Icon name="plus" size={20} color={commonStyles.colors.secundary} />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -142,5 +168,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     justifyContent: 'flex-end',
     marginTop: Platform.OS === 'ios' ? 40 : 10,
+  },
+  addButton: {
+    position: 'absolute',
+    right: 30,
+    bottom: 30,
+    width: 40,
+    height: 40,
+    borderRadius: 40,
+    backgroundColor: commonStyles.colors.today,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
